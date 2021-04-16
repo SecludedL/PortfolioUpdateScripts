@@ -1,20 +1,15 @@
-function updaterStocksRo() {
-  var tickerFormat = /RO\.([a-z0-9-]{1,6})/i;
+import { Instrument } from "../../Models/instrument";
+import { updaterAbstract } from "./updaterAbstract";
+
+export class updaterStocksRo extends updaterAbstract {
+  protected tickerFormat = /RO\.([a-z0-9-]{1,6})/i;
   
-  this.matchTicker = function(ticker) {
-    if (ticker.match(tickerFormat)) {
-      return true;
-    }
-    
-    return false;
-  }
-  
-  this.getLatestValue = function(ticker) {
+  public getLatestDetails(ticker: string): Instrument {
     // turn the ticker into an asset code by stripping the prefix. eg: RO.TLV turns into TLV
-    var matches          = ticker.match(tickerFormat);
-    var updatedPriceData = getLatestAssetValue(matches[1]);
+    var matches          = ticker.match(this.tickerFormat);
+    var updatedPriceData = this.getLatestAssetValue(matches[1]);
     
-    if (updatedPriceData.value == null) {
+    if (updatedPriceData.valueDate == null) {
       return null;
     }
     
@@ -26,20 +21,26 @@ function updaterStocksRo() {
     return updatedInstrument;
   }
   
-  var getLatestAssetValue = function(assetTicker) {
+  private getLatestAssetValue(assetTicker) {
     // fetch the content of the asset page on the bvb.ro website
-    var url      = "http://bvb.ro/FinancialInstruments/Details/FinancialInstrumentsDetails.aspx?s=" + assetTicker;  
-    var response = UrlFetchApp.fetch(url).getContentText();  
+    var url      = "http://bvb.ro/FinancialInstruments/Details/FinancialInstrumentsDetails.aspx?s=" + assetTicker;
+    var response = UrlFetchApp.fetch(url);
+
+    if ((response.getResponseCode() !== 200)
+        || (response.getContentText().match(/invalid/i))) {
+      throw new Error("Can't retrieve BVB pricing page for instrument " + assetTicker);
+    }
+
     // Use a custom library (Cheerio) in order to parse the HTML contents of the page, as XmlSerivce is too strict
-    const doc    = Cheerio.load(response);
+    const doc = Cheerio.load(response.getContentText());
        
     return {
-      value: getLatestPriceFromDocument(doc),
-      valueDate: getLatestPriceDateFromDocument(doc)
+      value: this.getLatestPriceFromDocument(doc),
+      valueDate: this.getLatestPriceDateFromDocument(doc)
     };
   }
   
-  var getLatestPriceFromDocument = function(doc) {
+  private getLatestPriceFromDocument(doc):number {
     // extract the latest price and process it in order to be treated as a number
     let latestPrice = doc('.horizontal-box .value').text();
     
@@ -47,15 +48,14 @@ function updaterStocksRo() {
     if (latestPrice == undefined) {
       return null;
     } else {
-      return Number(latestPrice.replace(',', ''));
+      return Number(latestPrice.replace(',', '')).valueOf();
     }
   }
   
-  var getLatestPriceDateFromDocument = function(doc) {
+  private getLatestPriceDateFromDocument(doc):Date {
     // extract the corresponding date for the latest price
     let priceDateNode = doc('.horizontal-box .tooltip-value .date').text();
     let priceDateMatches = priceDateNode.match(/(\d{1,2})\/(\d{1,2})\/(\d{1,4})/i);
-    let latestPriceDate;
     
     if (priceDateMatches == null) {
       return null;

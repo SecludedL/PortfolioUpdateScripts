@@ -1,20 +1,17 @@
-function updaterIndexesRo() {
-  var tickerFormat = /IX\.RO\-([a-z0-9-]{1,6})/i;
-  
-  this.matchTicker = function(ticker) {
-    if (ticker.match(tickerFormat)) {
-      return true;
-    }
-    
-    return false;
-  }
-   
-  this.getLatestValue = function(ticker) {
-    // retrieve the latest 
-    var latestIndexValue = getLatestIndexValue(getBvbIndexCodeByTicker(ticker));
+import { Instrument } from '../../Models/instrument';
+import { updaterAbstract } from './updaterAbstract'
+
+export class updaterIndexesRo extends updaterAbstract {
+  protected tickerFormat = /IX\.RO\-([a-z0-9-]{1,6})/i;
+
+  public getLatestDetails(ticker: string): Instrument {
+    // retrieve the latest index value
+    var latestIndexValue = this.getLatestIndexValue(
+      this.getBvbIndexCodeByTicker(ticker)
+    );
     
     if (latestIndexValue.value == null) {
-      return null;
+      throw new Error("Can't retrieve latest value for index " + ticker);
     }
     
     // return the updated instrument values as a standard Instrument object
@@ -26,12 +23,12 @@ function updaterIndexesRo() {
   }
   
   // turn the ticker into an index code/symbol (used by BVB) by stripping the prefix eg: IX.RO-BET turns into BET
-  var getBvbIndexCodeByTicker = function(ticker) {
-    let matches = ticker.match(tickerFormat);
+  private getBvbIndexCodeByTicker(ticker: string) {
+    let matches = ticker.match(this.tickerFormat);
     return matches[1];
   }
   
-  var getLatestIndexValue = function(indexTicker) {
+  private getLatestIndexValue(indexTicker: string) {
     // fetch the content of the index page on the bvb.ro website
     let url      = "http://bvb.ro/FinancialInstruments/Indices/IndicesProfiles.aspx?i=" + indexTicker;  
     let response = UrlFetchApp.fetch(url).getContentText();
@@ -44,7 +41,7 @@ function updaterIndexesRo() {
     // attempt to get the date associated with the index value
     let valueDateLabel   = doc('#ctl00_ctl00_body_rightColumnPlaceHolder_IndexProfilesCurrentValues_UpdatePanel11 span.date span.small').text();
     let valueDateMatches = valueDateLabel.match(/(\d{1,2})\/(\d{1,2})\/(\d{1,4})/i);
-    let indexValueDate;
+    let indexValueDate: Date;
     
     if (valueDateMatches.length == 4) {
       let valueDateString = `${valueDateMatches[3]}-${valueDateMatches[1]}-${valueDateMatches[2]}`
@@ -59,5 +56,4 @@ function updaterIndexesRo() {
       valueDate: indexValueDate
     };
   }
-
 }
