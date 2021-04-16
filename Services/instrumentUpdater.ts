@@ -49,13 +49,13 @@ export class instrumentUpdater {
         if (!instrumentRepo.persistInstrument(updatedInstrument)) {
           throw new Error("Can't update instrument in the repository: " + updatedInstrument.getTicker());
         }
+
+        console.log("Updated instrument " + instrument.getTicker(), updatedInstrument, updater);
       } catch (error) {
         SpreadsheetApp.getUi().alert(error);
         console.error(error);
         return;
       }
-    
-      console.log("Updated instrument " + instrument.getTicker(), updatedInstrument, updater);
     });
   }
 
