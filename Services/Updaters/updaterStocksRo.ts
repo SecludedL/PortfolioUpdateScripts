@@ -42,7 +42,7 @@ export class updaterStocksRo extends updaterAbstract {
   
   private getLatestPriceFromDocument(doc):number {
     // extract the latest price and process it in order to be treated as a number
-    let latestPrice = doc('.horizontal-box .value').text();
+    let latestPrice = doc('.tooltip-value .value').text();
     
     // remove the thousands separator (comma)
     if (latestPrice == undefined) {
