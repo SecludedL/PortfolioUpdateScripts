@@ -54,7 +54,7 @@ export class updaterStocksRo extends updaterAbstract {
   
   private getLatestPriceDateFromDocument(doc):Date {
     // extract the corresponding date for the latest price
-    let priceDateNode = doc('.horizontal-box .tooltip-value .date').text();
+    let priceDateNode = doc('.tooltip-value .date').text();
     let priceDateMatches = priceDateNode.match(/(\d{1,2})\/(\d{1,2})\/(\d{1,4})/i);
     
     if (priceDateMatches == null) {
