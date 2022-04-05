@@ -2,10 +2,10 @@ import { Instrument } from "../../Models/instrument";
 import { updaterAbstract } from "./updaterAbstract";
 
 export class updaterStocksApiDojoBloomberg extends updaterAbstract {
-  protected tickerFormat = /(AT|DKC|ES|GB|PT|SG)\.([a-z0-9-]{1,6})/i;
+  protected tickerFormat = /(AT|DE|DKC|ES|GB|PT|SG)\.([a-z0-9-]{1,6})/i;
   
   private apiKey        = "af22c5daa4mshd4e741161eccb50p1288b5jsn28844ecf8513";
-  private countryMapper = {AT: "av", DKC: "DC", ES: "sm", GB: "ln", PT: "li", SG: "sp"};
+  private countryMapper = {AT: "av", DE: "gr", DKC: "DC", ES: "sm", GB: "ln", PT: "li", SG: "sp"};
   
   public getLatestDetails(ticker: string): Instrument {
     // turn the ticker into an asset code by converting the country code and using it as a suffix instead of prefix. eg: SG.CEE turns into CEE.SGP
@@ -29,6 +29,7 @@ export class updaterStocksApiDojoBloomberg extends updaterAbstract {
   private getBloombergSymbolForTicker(ticker) {
     let matches = ticker.match(this.tickerFormat);
     
+    // reconfigure the ticker to adhere to the Bloomberg format (eg: DE.WEW => WEW:gr, ES.BBVA => BBVA:sm)
     let countryCode = matches[1];
     if (this.countryMapper[countryCode] == undefined) {
       return null;
@@ -42,11 +43,11 @@ export class updaterStocksApiDojoBloomberg extends updaterAbstract {
   
   private getLatestAssetPrice(assetCode) {
     // fetch the latest asset prices from the AlphaVantage API
-    let url        = "https://bloomberg-market-and-financial-news.p.rapidapi.com/market/get-compact?id=" + assetCode;
+    let url        = "https://bb-finance.p.rapidapi.com/market/get-compact?id=" + assetCode;
     let reqOptions = {
       'method': 'GET',
       'headers': {
-        'x-rapidapi-host': 'bloomberg-market-and-financial-news.p.rapidapi.com',
+        'x-rapidapi-host': 'bb-finance.p.rapidapi.com',
         'x-rapidapi-key' : this.apiKey,
         'useQueryString' : true
       }
@@ -58,7 +59,7 @@ export class updaterStocksApiDojoBloomberg extends updaterAbstract {
       throw new Error('Cannot retrieve instrument data for ' + assetCode + '. Reason: ' + response.getContentText());
     }
 
-    response     = JSON.parse(response.getContentText());
+    response = JSON.parse(response.getContentText());
   
     if (response["result"][assetCode] == undefined) {
       return null;
