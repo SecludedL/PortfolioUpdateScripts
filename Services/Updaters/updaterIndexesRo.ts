@@ -35,11 +35,11 @@ export class updaterIndexesRo extends updaterAbstract {
   
     // try to get to the node that hosts the index value and remove the thousands separator
     const doc      = Cheerio.load(response);
-    let valueLabel = doc('#ctl00_ctl00_body_rightColumnPlaceHolder_IndexProfilesCurrentValues_UpdatePanel11 strong.value').text();
+    let valueLabel = doc('#ctl00_ctl00_body_rightColumnPlaceHolder_IndexProfilesCurrentValues_UpdatePanel11 b.value').text();
     let indexValue = Number(valueLabel.replace(',', ''));
     
     // attempt to get the date associated with the index value
-    let valueDateLabel   = doc('#ctl00_ctl00_body_rightColumnPlaceHolder_IndexProfilesCurrentValues_UpdatePanel11 span.date span.small').text();
+    let valueDateLabel   = doc('#ctl00_ctl00_body_rightColumnPlaceHolder_IndexProfilesCurrentValues_UpdatePanel11 span.date').text();
     let valueDateMatches = valueDateLabel.match(/(\d{1,2})\/(\d{1,2})\/(\d{1,4})/i);
     let indexValueDate: Date;
     
