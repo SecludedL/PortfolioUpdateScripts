@@ -48,14 +48,14 @@ export class updaterStocksRo extends updaterAbstract {
     if (latestPrice == undefined) {
       return null;
     } else {
-      return Number(latestPrice.replace(',', '')).valueOf();
+      return Number(latestPrice.replace('.', '').replace(',', '.')).valueOf();
     }
   }
   
   private getLatestPriceDateFromDocument(doc):Date {
     // extract the corresponding date for the latest price
     let priceDateNode = doc('.tooltip-value .date').text();
-    let priceDateMatches = priceDateNode.match(/(\d{1,2})\/(\d{1,2})\/(\d{1,4})/i);
+    let priceDateMatches = priceDateNode.match(/(\d{1,2})\.(\d{1,2})\.(\d{1,4})/i);
     
     if (priceDateMatches == null) {
       return null;
@@ -65,7 +65,7 @@ export class updaterStocksRo extends updaterAbstract {
       return null;
     }
     
-    let priceDateString = `${priceDateMatches[3]}-${priceDateMatches[1]}-${priceDateMatches[2]}`
+    let priceDateString = `${priceDateMatches[3]}-${priceDateMatches[2]}-${priceDateMatches[1]}`
     return new Date(priceDateString);
   }
 }
