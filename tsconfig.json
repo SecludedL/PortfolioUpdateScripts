@@ -1,7 +1,17 @@
 {
-    "compilerOptions": {
-      "lib": ["esnext"],
-      "experimentalDecorators": true
-    }
-  }
-  
+  "compilerOptions": {
+      "lib": ["ES5"],
+      "strict": false,
+      "experimentalDecorators": true,
+      "esModuleInterop": true,
+      "sourceMap": true,
+      "rootDir": "./src", // Input directory
+      "outDir": "./dist"  // Output directory
+  },
+  "include": [
+      "./src/**/*.ts"
+  ],
+  "exclude": [
+      "node_modules"
+  ]
+}

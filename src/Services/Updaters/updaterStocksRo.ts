@@ -1,5 +1,7 @@
-import { Instrument } from "../../Models/instrument";
+import { Document } from "parse5/dist/tree-adapters/default";
+import { Instrument } from "../../Models/Instrument";
 import { updaterAbstract } from "./updaterAbstract";
+import { JSDOM } from "jsdom";
 
 export class updaterStocksRo extends updaterAbstract {
   protected tickerFormat = /RO\.([a-z0-9-]{1,6})/i;
@@ -26,23 +28,19 @@ export class updaterStocksRo extends updaterAbstract {
     var url      = "http://bvb.ro/FinancialInstruments/Details/FinancialInstrumentsDetails.aspx?s=" + assetTicker;
     var response = UrlFetchApp.fetch(url);
 
-    if ((response.getResponseCode() !== 200)
-        || (response.getContentText().match(/invalid/i))) {
-      throw new Error("Can't retrieve BVB pricing page for instrument " + assetTicker);
-    }
-
-    // Use a custom library (Cheerio) in order to parse the HTML contents of the page, as XmlSerivce is too strict
-    const doc = Cheerio.load(response.getContentText());
+    // const document =  Cheerio.load(response.getContentText());
+    // return the JSDOM object from the HTTP response object
+    const document = new JSDOM(response.getContentText()).window.document;
        
     return {
-      value: this.getLatestPriceFromDocument(doc),
-      valueDate: this.getLatestPriceDateFromDocument(doc)
+      value: this.getLatestPriceFromDocument(document),
+      valueDate: this.getLatestPriceDateFromDocument(document)
     };
   }
   
-  private getLatestPriceFromDocument(doc):number {
-    // extract the latest price and process it in order to be treated as a number
-    let latestPrice = doc('.tooltip-value .value').text();
+  private getLatestPriceFromDocument(doc: JSDOM):number {
+    // extract the latest price using JSDOM and process it in order to be treated as a number
+    const latestPrice = doc.querySelector('.tooltip-value .value').textContent;
     
     // remove the thousands separator (comma)
     if (latestPrice == undefined) {
@@ -52,10 +50,12 @@ export class updaterStocksRo extends updaterAbstract {
     }
   }
   
-  private getLatestPriceDateFromDocument(doc):Date {
-    // extract the corresponding date for the latest price
-    let priceDateNode = doc('.tooltip-value .date').text();
-    let priceDateMatches = priceDateNode.match(/(\d{1,2})\.(\d{1,2})\.(\d{1,4})/i);
+  private getLatestPriceDateFromDocument(doc: JSDOM):Date {
+    // extract the  date for the latest price 
+    const priceDateNode = doc.querySelector('.tooltip-value .date').textContent;
+
+    // extract the date from the string and convert it to a Date object
+    const priceDateMatches = priceDateNode.match(/(\d{1,2})\.(\d{1,2})\.(\d{1,4})/i);
     
     if (priceDateMatches == null) {
       return null;

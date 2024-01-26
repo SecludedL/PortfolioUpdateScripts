@@ -5,11 +5,43 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "pwa-chrome",
+            "type": "node",
             "request": "launch",
-            "name": "Launch Chrome against localhost",
-            "url": "http://localhost:8080",
-            "webRoot": "${workspaceFolder}"
+            "name": "Debug Local - Index Data",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "dev-indexes"
+            ],
+            // "preLaunchTask": "tsc: build - tsconfig.json", // runs the TypeScript compiler
+            "outFiles": ["${workspaceFolder}/dist/**/*.js"], // points to the compiled JavaScript files
+            "sourceMaps": true // enables source maps for debugging TypeScript
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Local - FX Data",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "dev-fx"
+            ],
+            // "preLaunchTask": "tsc: build - tsconfig.json", // runs the TypeScript compiler
+            "outFiles": ["${workspaceFolder}/dist/**/*.js"], // points to the compiled JavaScript files
+            "sourceMaps": true // enables source maps for debugging TypeScript
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Local - Stocks Data",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "dev-stocks"
+            ],
+            // "preLaunchTask": "tsc: build - tsconfig.json", // runs the TypeScript compiler
+            "outFiles": ["${workspaceFolder}/dist/**/*.js"], // points to the compiled JavaScript files
+            "sourceMaps": true // enables source maps for debugging TypeScript
         }
     ]
 }

@@ -1,4 +1,4 @@
-import { Instrument } from "../../Models/instrument";
+import { Instrument } from "../../Models/Instrument";
 
 export abstract class updaterAbstract {
     protected tickerFormat: RegExp;

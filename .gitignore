@@ -1,3 +1,4 @@
+dist/
 node_modules/
 .clasprc.json
 claspcreds.json

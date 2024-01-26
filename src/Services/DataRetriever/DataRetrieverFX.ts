@@ -1,7 +1,7 @@
-import { Instrument } from "../../Models/instrument";
-import { updaterAbstract } from "./updaterAbstract";
+import { Instrument } from "../../Models/Instrument";
+import { DataRetrieverAbstract } from "./DataRetrieverAbstract";
 
-export class updaterFX extends updaterAbstract {
+export class DataRetrieverFX extends DataRetrieverAbstract {
   protected tickerFormat = /FX\.([a-z]{2,3})\/([a-z]{2,3})/i;
 
   private accessKey = '562459454e40bb3b942ef135d8e4c9ac';
@@ -33,13 +33,13 @@ export class updaterFX extends updaterAbstract {
 
     // fetch the content of the index page on the bvb.ro website
     let url      = "http://apilayer.net/api/live?access_key=" + this.accessKey + '&source=' + this.fixedBaseCurrency + "&currencies=" + pairCurrencies;
-    let response = UrlFetchApp.fetch(url);
+    let response = this.HTTPClient.getPageContents(url, {});
   
     if (response.getResponseCode() != 200) {
-      throw new Error('Error retrieving data for currency ' + pairCurrency + '. Message: ' + response.getContentText());
+      throw new Error('Error retrieving data for currency ' + pairCurrency + '. Message: ' + response.getResponseBody());
     }
 
-    let responseObj = JSON.parse(response.getContentText());
+    let responseObj = JSON.parse(response.getResponseBody());
   
     // try to get the rate from the response
     let fxRate = null;

@@ -1,10 +1,12 @@
-import { Instrument } from '../Models/instrument'
+import { Instrument } from '../../Models/Instrument'
+import { InstrumentRepositoryAbstract } from './Abstract'
 
-export class instrumentRepository {
-  private tickerDictionary: Map<string, Instrument>;
+export class InstrumentRepositoryGoogleSheets extends InstrumentRepositoryAbstract {
   private referenceSheet: string;
 
   public constructor(referenceSheetName = 'Referinte') {
+    super();
+
     this.tickerDictionary = new Map();
     this.referenceSheet = referenceSheetName;
   }
@@ -18,17 +20,6 @@ export class instrumentRepository {
     this.tickerDictionary = this.getInstrumentsFromReferenceSheet();
     
     return this.tickerDictionary;
-  }
-
-  public getInstrumentDataByTicker(lookupTicker: string) {
-    var instruments = this.getAllInstruments();
-    
-    // if the data for this ticker was already looked up, return it
-    if (instruments.has(lookupTicker)) {
-      return instruments.get(lookupTicker);
-    } else {
-      return null;
-    }
   }
   
   public persistInstrument(instrument: Instrument) {

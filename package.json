@@ -1,5 +1,21 @@
 {
   "dependencies": {
-    "@types/google-apps-script": "^1.0.64"
+    "@types/google-apps-script": "^1.0.78",
+    "cli-table3": "^0.6.3",
+    "commander": "^11.1.0",
+    "es6-promise": "^4.2.8",
+    "jsdom": "^24.0.0",
+    "node-fetch": "^2.7.0",
+    "sync-request": "^6.1.0"
+  },
+  "scripts": {
+    "dev-fx": "tsc src/dev/local.ts --outDir dist --sourceMap && node dist/dev/local.js update-fx",
+    "dev-indexes": "tsc src/dev/local.ts --outDir dist --sourceMap && node dist/dev/local.js update-indexes",
+    "dev-stocks": "tsc src/dev/local.ts --outDir dist --sourceMap && node dist/dev/local.js update-stocks",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^21.1.6",
+    "@types/node-fetch": "^2.6.11"
   }
 }

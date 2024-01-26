@@ -1,21 +1,23 @@
-import { Instrument } from '../Models/instrument';
-import { instrumentRepository } from '../Repositories/instrumentRepository';
+import { Instrument } from '../Models/Instrument';
+import { InstrumentRepositoryAbstract } from '../Repositories/InstrumentRepository/Abstract';
 import { updaterAbstract } from './Updaters/updaterAbstract'
 
-export class instrumentUpdater {
-  public updaterPlugins: Map<string, updaterAbstract>;
+export class InstrumentUpdater {
+  protected updaterPlugins: Map<string, updaterAbstract>;
+  protected instrumentRepo: InstrumentRepositoryAbstract;
   
-  public constructor() {
+  public constructor(instrumentRepo: InstrumentRepositoryAbstract) {
     this.updaterPlugins = new Map();
+    this.instrumentRepo = instrumentRepo;
   }
   
-  public addPlugin(pluginId: string, updaterPlugin: updaterAbstract): instrumentUpdater {
+  public addPlugin(pluginId: string, updaterPlugin: updaterAbstract): InstrumentUpdater {
     this.updaterPlugins.set(pluginId, updaterPlugin);
     
     return this;
   }
   
-  public removePlugin(pluginId: string): instrumentUpdater {
+  public removePlugin(pluginId: string): InstrumentUpdater {
     if (this.updaterPlugins.has(pluginId)) {
       this.updaterPlugins.delete(pluginId);
     }
@@ -30,8 +32,9 @@ export class instrumentUpdater {
   }
   
   public retrieveAndUpdateAssetPrices() {
-    let instrumentRepo = new instrumentRepository();
-    let instrumentsWithUpdaters = this.getInstrumentsMatchingPlugins(instrumentRepo.getAllInstruments());
+    let instrumentsWithUpdaters = this.getInstrumentsMatchingPlugins(
+      this.instrumentRepo.getAllInstruments()
+    );
   
     instrumentsWithUpdaters.forEach((updater, instrument, map) => {
       if (!instrument.needsUpdate()) {
@@ -46,7 +49,7 @@ export class instrumentUpdater {
           throw new Error("Can't retrieve latest value for instrument: " + instrument.getTicker());
         }
 
-        if (!instrumentRepo.persistInstrument(updatedInstrument)) {
+        if (!this.instrumentRepo.persistInstrument(updatedInstrument)) {
           throw new Error("Can't update instrument in the repository: " + updatedInstrument.getTicker());
         }
 

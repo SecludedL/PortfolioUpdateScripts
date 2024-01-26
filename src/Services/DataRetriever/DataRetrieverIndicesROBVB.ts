@@ -1,7 +1,8 @@
-import { Instrument } from '../../Models/instrument';
-import { updaterAbstract } from './updaterAbstract'
+import { Instrument } from '../../Models/Instrument';
+import { DataRetrieverAbstract } from './DataRetrieverAbstract';
+import { JSDOM } from 'jsdom';
 
-export class updaterIndexesRo extends updaterAbstract {
+export class DataRetrieverIndicesROBVB extends DataRetrieverAbstract {
   protected tickerFormat = /IX\.RO\-([a-z0-9-]{1,6})/i;
 
   public getLatestDetails(ticker: string): Instrument {
@@ -28,18 +29,21 @@ export class updaterIndexesRo extends updaterAbstract {
     return matches[1];
   }
   
-  private getLatestIndexValue(indexTicker: string) {
+  private getLatestIndexValue(indexTicker: string): { value: number, valueDate: Date } {
     // fetch the content of the index page on the bvb.ro website
     let url      = "http://bvb.ro/FinancialInstruments/Indices/IndicesProfiles.aspx?i=" + indexTicker;  
-    let response = UrlFetchApp.fetch(url).getContentText();
+    let response = this.HTTPClient.getPageContents(url, {});
+    
+    // UrlFetchApp.fetch(url).getContentText();
   
-    // try to get to the node that hosts the index value and remove the thousands separator
-    const doc      = Cheerio.load(response);
-    let valueLabel = doc('#ctl00_ctl00_body_rightColumnPlaceHolder_IndexProfilesCurrentValues_UpdatePanel11 b.value').text();
-    let indexValue = Number(valueLabel.replace('.', '').replace(',', '.'));
+    // try to get to the node that hosts the index value and remove the thousands separator using JSDOC
+    const document = new JSDOM(response.getResponseBody()).window.document;
+
+    const valueLabel = document.querySelector('#ctl00_ctl00_body_rightColumnPlaceHolder_IndexProfilesCurrentValues_UpdatePanel11 b.value').textContent;
+    const indexValue = Number(valueLabel.replace('.', '').replace(',', '.'));
     
     // attempt to get the date associated with the index value
-    let valueDateLabel   = doc('#ctl00_ctl00_body_rightColumnPlaceHolder_IndexProfilesCurrentValues_UpdatePanel11 span.date').text();
+    let valueDateLabel   = document.querySelector('#ctl00_ctl00_body_rightColumnPlaceHolder_IndexProfilesCurrentValues_UpdatePanel11 span.date').textContent;
     let valueDateMatches = valueDateLabel.match(/(\d{1,2})\.(\d{1,2})\.(\d{1,4})/i);
     let indexValueDate: Date;
     

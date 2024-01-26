@@ -1,11 +1,11 @@
-import { Instrument } from "../../Models/instrument";
-import { updaterAbstract } from "./updaterAbstract";
+import { Instrument } from "../../Models/Instrument";
+import { DataRetrieverAbstract } from "./DataRetrieverAbstract";
 
-export class updaterStocksApiDojoBloomberg extends updaterAbstract {
-  protected tickerFormat = /(AT|DE|DKC|ES|GB|PT|SG)\.([a-z0-9-]{1,6})/i;
+export class DataRetrieverStocksApiDojoBloomberg extends DataRetrieverAbstract {
+  protected tickerFormat = /(AT|DE|DKC|ES|GB|SG|US)\.([a-z0-9-]{1,6})/i;
   
   private apiKey        = "af22c5daa4mshd4e741161eccb50p1288b5jsn28844ecf8513";
-  private countryMapper = {AT: "av", DE: "gr", DKC: "DC", ES: "sm", GB: "ln", PT: "li", SG: "sp"};
+  private countryMapper = {AT: "av", DE: "gr", DKC: "DC", ES: "sm", GB: "ln", SG: "sp", US: "us"};
   
   public getLatestDetails(ticker: string): Instrument {
     // turn the ticker into an asset code by converting the country code and using it as a suffix instead of prefix. eg: SG.CEE turns into CEE.SGP
@@ -44,22 +44,19 @@ export class updaterStocksApiDojoBloomberg extends updaterAbstract {
   private getLatestAssetPrice(assetCode) {
     // fetch the latest asset prices from the AlphaVantage API
     let url        = "https://bb-finance.p.rapidapi.com/market/get-compact?id=" + assetCode;
-    let reqOptions = {
-      'method': 'GET',
-      'headers': {
-        'x-rapidapi-host': 'bb-finance.p.rapidapi.com',
-        'x-rapidapi-key' : this.apiKey,
-        'useQueryString' : true
-      }
+    let reqHeaders = {
+      'x-rapidapi-host': 'bb-finance.p.rapidapi.com',
+      'x-rapidapi-key' : this.apiKey,
+      'useQueryString' : 'true'
     }
     
-    let response = UrlFetchApp.fetch(url, reqOptions);
+    let response = this.HTTPClient.getPageContents(url, reqHeaders);
 
     if (response.getResponseCode() != 200) {
-      throw new Error('Cannot retrieve instrument data for ' + assetCode + '. Reason: ' + response.getContentText());
+      throw new Error('Cannot retrieve instrument data for ' + assetCode + '. Reason: ' + response.getResponseBody());
     }
 
-    response = JSON.parse(response.getContentText());
+    response = JSON.parse(response.getResponseBody());
   
     if (response["result"][assetCode] == undefined) {
       return null;

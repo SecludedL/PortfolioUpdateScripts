@@ -1,11 +1,15 @@
-import { instrumentUpdater } from './Services/instrumentUpdater'
-import { updaterFX } from './Services/Updaters/updaterFX';
-import { updaterIndexesRo } from './Services/Updaters/updaterIndexesRo'
+import { InstrumentUpdater } from './Services/instrumentUpdater'
+import { updaterFX } from './Services/DataRetriever/DataRetrieverFX';
+import { updaterIndexesRo } from './Services/DataRetriever/DataRetrieverIndicesROBVB'
 import { updaterStocksApiDojoBloomberg } from './Services/Updaters/updaterStocksApiDojoBloomberg';
 import { updaterStocksRo } from './Services/Updaters/updaterStocksRo'
+import { InstrumentRepositoryGoogleSheets } from './Repositories/InstrumentRepository/GoogleSheets';
 
 function updateIndexesAndBenchmarks() {
-  var updater = new instrumentUpdater();
+  var updater = new InstrumentUpdater(
+    new InstrumentRepositoryGoogleSheets()
+  );
+
   updater
     .resetPlugins()
     .addPlugin('indexesRO', new updaterIndexesRo())
@@ -13,7 +17,10 @@ function updateIndexesAndBenchmarks() {
 }
 
 function updateFxRates() {
-  var updater = new instrumentUpdater();
+  var updater = new InstrumentUpdater(
+    new InstrumentRepositoryGoogleSheets()
+  );
+  
   updater
     .resetPlugins()
     .addPlugin('fxRates', new updaterFX())
@@ -21,7 +28,10 @@ function updateFxRates() {
 }
 
 function updateStocks() {
-  var updater = new instrumentUpdater();
+  var updater = new InstrumentUpdater(
+    new InstrumentRepositoryGoogleSheets()
+  );
+ 
   updater
     .resetPlugins()
     .addPlugin('stocksRO', new updaterStocksRo())

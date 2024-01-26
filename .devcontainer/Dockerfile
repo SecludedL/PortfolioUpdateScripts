@@ -1,7 +1,6 @@
 # See here for image contents: https://github.com/microsoft/vscode-dev-containers/tree/v0.166.1/containers/typescript-node/.devcontainer/base.Dockerfile
 
-# [Choice] Node.js version: 14, 12, 10
-ARG VARIANT="14-buster"
+ARG VARIANT="16"
 FROM mcr.microsoft.com/vscode/devcontainers/typescript-node:0-${VARIANT}
 
 # [Optional] Uncomment this section to install additional OS packages.
@@ -14,5 +13,4 @@ FROM mcr.microsoft.com/vscode/devcontainers/typescript-node:0-${VARIANT}
 USER root
 
 # [Optional] Uncomment if you want to install more global node packages
-RUN npm install -g @google/clasp \
-    && npm i -S @types/google-apps-script
+RUN npm install -g @google/clasp
