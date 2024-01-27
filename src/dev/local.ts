@@ -3,6 +3,9 @@ import { HTTPClientSyncRequest } from '../Services/HTTPClient/HTTPClientSyncRequ
 import { DataRetrieverFX } from '../Services/DataRetriever/DataRetrieverFX';
 import { DataRetrieverIndicesROBVB } from '../Services/DataRetriever/DataRetrieverIndicesROBVB';
 import { DataRetrieverStocksApiDojoBloomberg } from '../Services/DataRetriever/DataRetrieverStocksApiDojoBloomberg';
+import { DataRetrieverStocksRoBVB } from '../Services/DataRetriever/DataRetrieverStocksRoBVB';
+import { BulkInstrumentDataRetrievalService } from '../Services/BulkInstrumentDataRetrievalService';
+import { Instrument } from '../Models/Instrument';
 
 const program = new Command();
 
@@ -13,64 +16,81 @@ program
 program.command('update-indexes')
   .description('Grab the latest index and benchmark values from multiples sources')
   .action((str, options) => {
-    var roIndexes = ['IX.RO-BET', 'IX.RO-BET-TR', 'IX.RO-BET-TR'];    
+    const instrumentsToUpdate = [
+      new Instrument("IX.RO-BET"), 
+      new Instrument("IX.RO-BET-TR"),
+      new Instrument("IX.RO-BET-FI")
+    ];
 
-    var indexDataRetriever = new DataRetrieverIndicesROBVB(
-      new HTTPClientSyncRequest()
-    );
+    const httpClient         = new HTTPClientSyncRequest();
+    let dataRetrievalService = new BulkInstrumentDataRetrievalService();
+    dataRetrievalService
+      .addDataRetriever('indexesRO', new DataRetrieverIndicesROBVB(httpClient));
 
-    //please write a foreach for roIndexes in TypeScript
-    roIndexes.forEach(function (indexTicker) {
-        try {
-          console.log('Processing index ' + indexTicker);
-          var instrumentDetails = indexDataRetriever.getLatestDetails(indexTicker);
-          console.log('Value for index ' + indexTicker + ' is ' + instrumentDetails.getValue() + ' at date ' + instrumentDetails.getValueDate());
-        } catch (error) {
-          console.error('Error processing index ' + indexTicker + '. Error:' + error);
-        }
-    });
+    updateInstruments(instrumentsToUpdate, dataRetrievalService);
 });
 
 program.command('update-fx')
   .description('Grab the latest foreign exchange rates for various currency pairs')
   .action((str, options) => {
-    var fxTickers = ['FX.EUR/RON', 'FX.SGD/EUR', 'FX.USD/EUR'];    
+    const instrumentsToUpdate = [
+      new Instrument("FX.EUR/RON"), 
+      new Instrument("FX.SGD/EUR"),
+      new Instrument("FX.USD/EUR")
+    ];
 
-    var fxDataRetriever = new DataRetrieverFX(
-      new HTTPClientSyncRequest()
-    );
-
-    //please write a foreach for roIndexes in TypeScript
-    fxTickers.forEach(function (ticker) {
-        try {
-          console.log('Processing FX pair ' + ticker);
-          var instrumentDetails = fxDataRetriever.getLatestDetails(ticker);
-          console.log('Value for pair ' + ticker + ' is ' + instrumentDetails.getValue() + ' at date ' + instrumentDetails.getValueDate());
-        } catch (error) {
-          console.error('Error processing pair ' + ticker + '. Error:' + error);
-        }
-    });
+    const httpClient         = new HTTPClientSyncRequest();
+    let dataRetrievalService = new BulkInstrumentDataRetrievalService();
+    dataRetrievalService
+      .addDataRetriever('fxRates', new DataRetrieverFX(httpClient));
+    
+    updateInstruments(instrumentsToUpdate, dataRetrievalService);
 });
 
 program.command('update-stocks')
   .description('Grab the latest prices for exchange-traded companies (stocks)')
   .action((str, options) => {
-    var stockTickers = ["US.TWKS", 'AT.BG', 'AT.EBS', 'DE.WEW', "DE.BCPN"];    
+    const instrumentsToUpdate = [
+      new Instrument("RO.TLV"), 
+      new Instrument("RO.SNP"),
+      new Instrument("RO.GSH"),
+      new Instrument("US.TWKS"),
+      new Instrument("AT.BG"),
+      new Instrument("AT.EBS"),
+      new Instrument("DE.WEW"),
+      new Instrument("DE.BCPN")
+    ];
 
-    var stocksDataRetriever = new DataRetrieverStocksApiDojoBloomberg(
-      new HTTPClientSyncRequest()
-    );
+    const httpClient         = new HTTPClientSyncRequest();
+    let dataRetrievalService = new BulkInstrumentDataRetrievalService();
+    dataRetrievalService
+      .addDataRetriever('stocksRO', new DataRetrieverStocksRoBVB(httpClient))
+      .addDataRetriever('stocksIntl', new DataRetrieverStocksApiDojoBloomberg(httpClient));
 
-    //please write a foreach for roIndexes in TypeScript
-    stockTickers.forEach(function (ticker) {
-        try {
-          console.log('Processing company with ticker ' + ticker);
-          var instrumentDetails = stocksDataRetriever.getLatestDetails(ticker);
-          console.log('Value for stock ' + ticker + ' is ' + instrumentDetails.getValue() + ' at date ' + instrumentDetails.getValueDate());
-        } catch (error) {
-          console.error('Error processing company ' + ticker + '. Error:' + error);
-        }
-    });
+    updateInstruments(instrumentsToUpdate, dataRetrievalService);
 });
+
+let updateInstruments = function(instrumentsToUpdate: Array<Instrument>, dataRetrievalService: BulkInstrumentDataRetrievalService) {
+  instrumentsToUpdate.forEach(function (instrumentDetails: Instrument) {
+    try {
+      console.log('Processing instrument with ticker ' + instrumentDetails.getTicker());
+
+      let latestInstrumentData = 
+        dataRetrievalService.retrieveLatestDataForSingleInstrument(instrumentDetails); 
+
+      if (latestInstrumentData == null) {
+        console.log('No data to retrieve for instrument ' + instrumentDetails.getTicker());
+        return;
+      }
+
+      console.log(
+        'Value for instrument ' + instrumentDetails.getTicker() + ' is ' + 
+        latestInstrumentData.getValue() + ' at date ' + instrumentDetails.getValueDate()
+      );
+    } catch (error) {
+      console.error('Error processing instrument ' + instrumentDetails.getTicker() + '. Error:' + error);
+    }
+  });
+}
 
 program.parse();

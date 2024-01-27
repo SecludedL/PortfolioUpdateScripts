@@ -1,9 +1,8 @@
-import { Document } from "parse5/dist/tree-adapters/default";
+import { DataRetrieverAbstract } from "./DataRetrieverAbstract";
 import { Instrument } from "../../Models/Instrument";
-import { updaterAbstract } from "./updaterAbstract";
 import { JSDOM } from "jsdom";
 
-export class updaterStocksRo extends updaterAbstract {
+export class DataRetrieverStocksRoBVB extends DataRetrieverAbstract {
   protected tickerFormat = /RO\.([a-z0-9-]{1,6})/i;
   
   public getLatestDetails(ticker: string): Instrument {
@@ -25,12 +24,17 @@ export class updaterStocksRo extends updaterAbstract {
   
   private getLatestAssetValue(assetTicker) {
     // fetch the content of the asset page on the bvb.ro website
-    var url      = "http://bvb.ro/FinancialInstruments/Details/FinancialInstrumentsDetails.aspx?s=" + assetTicker;
-    var response = UrlFetchApp.fetch(url);
+    var url     = "https://bvb.ro/FinancialInstruments/Details/FinancialInstrumentsDetails.aspx?s=" + assetTicker;
+    var headers = {
+      'User-Agent': 'PostmanRuntime/7.36.1',
+      'Accept': '*/*'
+    };
+    
+    var response = this.HTTPClient.getPageContents(url, headers);
 
     // const document =  Cheerio.load(response.getContentText());
     // return the JSDOM object from the HTTP response object
-    const document = new JSDOM(response.getContentText()).window.document;
+    const document = new JSDOM(response.getResponseBody()).window.document;
        
     return {
       value: this.getLatestPriceFromDocument(document),
@@ -38,7 +42,7 @@ export class updaterStocksRo extends updaterAbstract {
     };
   }
   
-  private getLatestPriceFromDocument(doc: JSDOM):number {
+  private getLatestPriceFromDocument(doc: Document):number {
     // extract the latest price using JSDOM and process it in order to be treated as a number
     const latestPrice = doc.querySelector('.tooltip-value .value').textContent;
     
@@ -50,7 +54,7 @@ export class updaterStocksRo extends updaterAbstract {
     }
   }
   
-  private getLatestPriceDateFromDocument(doc: JSDOM):Date {
+  private getLatestPriceDateFromDocument(doc: Document):Date {
     // extract the  date for the latest price 
     const priceDateNode = doc.querySelector('.tooltip-value .date').textContent;
 

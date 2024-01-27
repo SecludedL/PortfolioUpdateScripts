@@ -31,11 +31,13 @@ export class DataRetrieverIndicesROBVB extends DataRetrieverAbstract {
   
   private getLatestIndexValue(indexTicker: string): { value: number, valueDate: Date } {
     // fetch the content of the index page on the bvb.ro website
-    let url      = "http://bvb.ro/FinancialInstruments/Indices/IndicesProfiles.aspx?i=" + indexTicker;  
-    let response = this.HTTPClient.getPageContents(url, {});
+    const url     = "https://bvb.ro/FinancialInstruments/Indices/IndicesProfiles.aspx?i=" + indexTicker;  
+    const headers = {
+      'User-Agent': 'PostmanRuntime/7.36.1',
+      'Accept': '*/*'
+    };
+    let response = this.HTTPClient.getPageContents(url, headers);
     
-    // UrlFetchApp.fetch(url).getContentText();
-  
     // try to get to the node that hosts the index value and remove the thousands separator using JSDOC
     const document = new JSDOM(response.getResponseBody()).window.document;
 
