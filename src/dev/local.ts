@@ -71,6 +71,8 @@ program.command('update-stocks')
 });
 
 let updateInstruments = function(instrumentsToUpdate: Array<Instrument>, dataRetrievalService: BulkInstrumentDataRetrievalService) {
+  // iterate through the instruments, retrieve the latest data for each of them
+  // and output the result
   instrumentsToUpdate.forEach(function (instrumentDetails: Instrument) {
     try {
       console.log('Processing instrument with ticker ' + instrumentDetails.getTicker());

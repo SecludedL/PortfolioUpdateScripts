@@ -1,23 +1,28 @@
 import { Instrument } from '../../Models/Instrument';
 import { DataRetrieverAbstract } from './DataRetrieverAbstract';
-import Cheerio from 'cheerio';
+import Cheerio, { CheerioAPI } from 'cheerio';
 
 export class DataRetrieverIndicesROBVB extends DataRetrieverAbstract {
   protected tickerFormat = /IX\.RO\-([a-z0-9-]{1,6})/i;
 
   public getLatestDetails(ticker: string): Instrument {
     // retrieve the latest index value
-    var latestIndexValue = this.getLatestIndexValue(
-      this.getBvbIndexCodeByTicker(ticker)
-    );
+    const normalizedTicker = this.getBvbIndexCodeByTicker(ticker);
+
+    // retrieve the contents of the page containing index details from the bvb.ro website
+    const indexPageObject:CheerioAPI = this.fetchIndexPageContents(normalizedTicker);
+
+    // attempt to retrieve the index value and the corresponding date from the page contents
+    const latestIndexValue     = this.getIndexValueFromPage(indexPageObject);
+    const latestIndexValueDate = this.getIndexValueDateFromPage(indexPageObject);
     
-    if (latestIndexValue.value == null) {
+    if (latestIndexValue == null) {
       throw new Error("Can't retrieve latest value for index " + ticker);
     }
     
     // return the updated instrument values as a standard Instrument object
     var updatedInstrument = new Instrument(ticker);
-    updatedInstrument.setValue(latestIndexValue.value, latestIndexValue.valueDate);
+    updatedInstrument.setValue(latestIndexValue, latestIndexValueDate);
     updatedInstrument.setLastUpdateDate(new Date())
     
     return updatedInstrument;
@@ -28,9 +33,15 @@ export class DataRetrieverIndicesROBVB extends DataRetrieverAbstract {
     let matches = ticker.match(this.tickerFormat);
     return matches[1];
   }
-  
-  private getLatestIndexValue(indexTicker: string): { value: number, valueDate: Date } {
-    // fetch the content of the index page on the bvb.ro website
+
+  /**
+   * Retrieves the contents of the page containing index details from the bvb.ro website
+   * and returns the contents as a CheerioAPI object
+   * 
+   * @param indexTicker 
+   * @returns CheerioAPI
+   */
+  private fetchIndexPageContents(indexTicker: string): CheerioAPI {
     const url     = "https://bvb.ro/FinancialInstruments/Indices/IndicesProfiles.aspx?i=" + indexTicker;  
     const headers = {
       'User-Agent': 'PostmanRuntime/7.36.1',
@@ -38,14 +49,32 @@ export class DataRetrieverIndicesROBVB extends DataRetrieverAbstract {
     };
     let response = this.HTTPClient.getPageContents(url, headers);
     
-    // try to get to the node that hosts the index value and remove the thousands separator using JSDOC
-    const cheerioDoc = Cheerio.load(response.getResponseBody())   ;
+    return Cheerio.load(response.getResponseBody());
+  }
 
-    const valueLabel = cheerioDoc('#ctl00_ctl00_body_rightColumnPlaceHolder_IndexProfilesCurrentValues_UpdatePanel11 b.value').text();
-    const indexValue = Number(valueLabel.replace('.', '').replace(',', '.'));
+  /**
+   * Attempts to retrieve the index value from the raw page contents
+   * 
+   * @param indexPageObject 
+   * @returns number
+   */
+  private getIndexValueFromPage(indexPageObject: CheerioAPI): number {
+    let valueLabel = indexPageObject('#ctl00_ctl00_body_rightColumnPlaceHolder_IndexProfilesCurrentValues_UpdatePanel11 b.value').text();
+    let indexValue = Number(valueLabel.replace('.', '').replace(',', '.'));
     
+    return indexValue;
+  }
+
+
+  /**
+   * Attempts to retrieve the date corresponding to the latest index value from the raw page contents
+   * 
+   * @param indexPageObject 
+   * @returns Date
+   */
+  private getIndexValueDateFromPage(indexPageObject: CheerioAPI): Date {
     // attempt to get the date associated with the index value
-    let valueDateLabel   = cheerioDoc('#ctl00_ctl00_body_rightColumnPlaceHolder_IndexProfilesCurrentValues_UpdatePanel11 span.date').text();
+    let valueDateLabel   = indexPageObject('#ctl00_ctl00_body_rightColumnPlaceHolder_IndexProfilesCurrentValues_UpdatePanel11 span.date').text();
     let valueDateMatches = valueDateLabel.match(/(\d{1,2})\.(\d{1,2})\.(\d{1,4})/i);
     let indexValueDate: Date;
     
@@ -56,10 +85,6 @@ export class DataRetrieverIndicesROBVB extends DataRetrieverAbstract {
       indexValueDate = null;
     }
 
-    // finally, build the return object made of the index value and the associated date
-    return {
-      value: indexValue,
-      valueDate: indexValueDate
-    };
+    return indexValueDate;
   }
 }

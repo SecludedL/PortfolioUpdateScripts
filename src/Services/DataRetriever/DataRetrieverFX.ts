@@ -1,6 +1,9 @@
 import { Instrument } from "../../Models/Instrument";
 import { DataRetrieverAbstract } from "./DataRetrieverAbstract";
 
+/**
+ * Provides methods to extract FX information using the apilayer.net API
+ */
 export class DataRetrieverFX extends DataRetrieverAbstract {
   protected tickerFormat = /FX\.([a-z]{2,3})\/([a-z]{2,3})/i;
 
@@ -22,6 +25,14 @@ export class DataRetrieverFX extends DataRetrieverAbstract {
     return updatedInstrument;
   }
   
+  /**
+   * This method retrieves the latest FX quote for the pair of currencies provided
+   * using the apilayer.net API and returns the value and the date of the quote.
+   * 
+   * @param baseCurrency string
+   * @param pairCurrency string
+   * @returns { value: number, valueDate: Date}
+   */
   private getLatestFxQuote(baseCurrency, pairCurrency: string) {    
     // the free pricing plan only allows for a fixed base currency, so if the base differs from 
     // the fixed one, first convert to the fixed base currency and then to the pair currency.
