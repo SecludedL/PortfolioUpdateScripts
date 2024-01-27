@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { HTTPClientSyncRequest } from '../Services/HTTPClient/HTTPClientSyncRequest';
 import { DataRetrieverFX } from '../Services/DataRetriever/DataRetrieverFX';
 import { DataRetrieverIndicesROBVB } from '../Services/DataRetriever/DataRetrieverIndicesROBVB';
+import { DataRetrieverIndicesFT } from '../Services/DataRetriever/DataRetrieverIndicesFT';
 import { DataRetrieverStocksApiDojoBloomberg } from '../Services/DataRetriever/DataRetrieverStocksApiDojoBloomberg';
 import { DataRetrieverStocksRoBVB } from '../Services/DataRetriever/DataRetrieverStocksRoBVB';
 import { BulkInstrumentDataRetrievalService } from '../Services/BulkInstrumentDataRetrievalService';
@@ -19,13 +20,15 @@ program.command('update-indexes')
     const instrumentsToUpdate = [
       new Instrument("IX.RO-BET"), 
       new Instrument("IX.RO-BET-TR"),
-      new Instrument("IX.RO-BET-FI")
+      new Instrument("IX.RO-BET-FI"),
+      new Instrument("IX.MSCI-World"),
     ];
 
     const httpClient         = new HTTPClientSyncRequest();
     let dataRetrievalService = new BulkInstrumentDataRetrievalService();
     dataRetrievalService
-      .addDataRetriever(new DataRetrieverIndicesROBVB(httpClient));
+      .addDataRetriever(new DataRetrieverIndicesROBVB(httpClient))
+      .addDataRetriever(new DataRetrieverIndicesFT(httpClient));
 
     updateInstruments(instrumentsToUpdate, dataRetrievalService);
 });
