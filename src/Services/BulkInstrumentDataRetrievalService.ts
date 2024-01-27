@@ -43,11 +43,11 @@ export class BulkInstrumentDataRetrievalService {
     let updater = this.getDataRetrieverForInstrument(instrument);
 
     if (updater == null) {
-      console.debug("No updater found for instrument: " + instrument.getTicker());
+      console.log("No updater found for instrument: " + instrument.getTicker());
       return null;
     }
     
-    console.debug("Updating instrument: " + instrument.getTicker() + " using updater: " + updater.constructor.name);
+    console.log("Updating instrument: " + instrument.getTicker() + " using updater: " + updater.constructor.name);
 
     let updatedInstrument = updater.getLatestDetails(instrument.getTicker());
 

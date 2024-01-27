@@ -82,7 +82,9 @@ let updateInstruments = function(
         console.log('[DONE] Done updating ' + instrument.getTicker());
       }
     } catch (error) {
-      console.error('[ERROR] Error processing instrument ' + instrument.getTicker() + '. Error:' + error);
+      let errorMessage = '[ERROR] Error processing instrument ' + instrument.getTicker() + '. Error:' + error;
+      console.error(errorMessage);
+      throw new Error(errorMessage);
     }
   });
 }

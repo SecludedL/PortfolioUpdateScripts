@@ -1,6 +1,6 @@
 import { Instrument } from '../../Models/Instrument';
 import { DataRetrieverAbstract } from './DataRetrieverAbstract';
-import { JSDOM } from 'jsdom';
+import Cheerio from 'cheerio';
 
 export class DataRetrieverIndicesROBVB extends DataRetrieverAbstract {
   protected tickerFormat = /IX\.RO\-([a-z0-9-]{1,6})/i;
@@ -39,13 +39,13 @@ export class DataRetrieverIndicesROBVB extends DataRetrieverAbstract {
     let response = this.HTTPClient.getPageContents(url, headers);
     
     // try to get to the node that hosts the index value and remove the thousands separator using JSDOC
-    const document = new JSDOM(response.getResponseBody()).window.document;
+    const cheerioDoc = Cheerio.load(response.getResponseBody())   ;
 
-    const valueLabel = document.querySelector('#ctl00_ctl00_body_rightColumnPlaceHolder_IndexProfilesCurrentValues_UpdatePanel11 b.value').textContent;
+    const valueLabel = cheerioDoc('#ctl00_ctl00_body_rightColumnPlaceHolder_IndexProfilesCurrentValues_UpdatePanel11 b.value').text();
     const indexValue = Number(valueLabel.replace('.', '').replace(',', '.'));
     
     // attempt to get the date associated with the index value
-    let valueDateLabel   = document.querySelector('#ctl00_ctl00_body_rightColumnPlaceHolder_IndexProfilesCurrentValues_UpdatePanel11 span.date').textContent;
+    let valueDateLabel   = cheerioDoc('#ctl00_ctl00_body_rightColumnPlaceHolder_IndexProfilesCurrentValues_UpdatePanel11 span.date').text();
     let valueDateMatches = valueDateLabel.match(/(\d{1,2})\.(\d{1,2})\.(\d{1,4})/i);
     let indexValueDate: Date;
     

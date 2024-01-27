@@ -1,0 +1,5 @@
+**/node_modules/**
+**/*.test.ts
+**/*.spec.ts
+**/dist/**
+**/src/dev/**

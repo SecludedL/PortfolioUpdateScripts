@@ -1,6 +1,6 @@
 import { DataRetrieverAbstract } from "./DataRetrieverAbstract";
 import { Instrument } from "../../Models/Instrument";
-import { JSDOM } from "jsdom";
+import Cheerio, { CheerioAPI } from 'cheerio';
 
 export class DataRetrieverStocksRoBVB extends DataRetrieverAbstract {
   protected tickerFormat = /RO\.([a-z0-9-]{1,6})/i;
@@ -29,22 +29,21 @@ export class DataRetrieverStocksRoBVB extends DataRetrieverAbstract {
       'User-Agent': 'PostmanRuntime/7.36.1',
       'Accept': '*/*'
     };
-    
+
     var response = this.HTTPClient.getPageContents(url, headers);
 
-    // const document =  Cheerio.load(response.getContentText());
-    // return the JSDOM object from the HTTP response object
-    const document = new JSDOM(response.getResponseBody()).window.document;
+    // return the Cheerio object from the HTTP response object
+    const cheerioDoc = Cheerio.load(response.getResponseBody());
        
     return {
-      value: this.getLatestPriceFromDocument(document),
-      valueDate: this.getLatestPriceDateFromDocument(document)
+      value: this.getLatestPriceFromDocument(cheerioDoc),
+      valueDate: this.getLatestPriceDateFromDocument(cheerioDoc)
     };
   }
   
-  private getLatestPriceFromDocument(doc: Document):number {
+  private getLatestPriceFromDocument(cheerioDoc: CheerioAPI):number {
     // extract the latest price using JSDOM and process it in order to be treated as a number
-    const latestPrice = doc.querySelector('.tooltip-value .value').textContent;
+    const latestPrice = cheerioDoc('.tooltip-value .value').text();
     
     // remove the thousands separator (comma)
     if (latestPrice == undefined) {
@@ -54,9 +53,9 @@ export class DataRetrieverStocksRoBVB extends DataRetrieverAbstract {
     }
   }
   
-  private getLatestPriceDateFromDocument(doc: Document):Date {
+  private getLatestPriceDateFromDocument(cheerioDoc: CheerioAPI):Date {
     // extract the  date for the latest price 
-    const priceDateNode = doc.querySelector('.tooltip-value .date').textContent;
+    const priceDateNode = cheerioDoc('.tooltip-value .date').text();
 
     // extract the date from the string and convert it to a Date object
     const priceDateMatches = priceDateNode.match(/(\d{1,2})\.(\d{1,2})\.(\d{1,4})/i);
