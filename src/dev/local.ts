@@ -5,6 +5,7 @@ import { DataRetrieverIndicesROBVB } from '../Services/DataRetriever/DataRetriev
 import { DataRetrieverIndicesFT } from '../Services/DataRetriever/DataRetrieverIndicesFT';
 import { DataRetrieverStocksApiDojoBloomberg } from '../Services/DataRetriever/DataRetrieverStocksApiDojoBloomberg';
 import { DataRetrieverStocksRoBVB } from '../Services/DataRetriever/DataRetrieverStocksRoBVB';
+import { DataRetrieverStocksFT } from '../Services/DataRetriever/DataRetrieverStocksFT';
 import { BulkInstrumentDataRetrievalService } from '../Services/BulkInstrumentDataRetrievalService';
 import { Instrument } from '../Models/Instrument';
 
@@ -55,20 +56,21 @@ program.command('update-stocks')
   .action((str, options) => {
     const instrumentsToUpdate = [
       new Instrument("RO.TLV"), 
-      new Instrument("RO.SNP"),
-      new Instrument("RO.GSH"),
-      new Instrument("US.TWKS"),
-      new Instrument("AT.BG"),
-      new Instrument("AT.EBS"),
+      // new Instrument("RO.SNP"),
+      // new Instrument("RO.GSH"),
+      // new Instrument("US.TWKS"),
+      // new Instrument("AT.BG"),
+      // new Instrument("AT.EBS"),
       new Instrument("DE.WEW"),
-      new Instrument("DE.BCPN")
+      new Instrument("PT.BCP")
     ];
 
     const httpClient         = new HTTPClientSyncRequest();
     let dataRetrievalService = new BulkInstrumentDataRetrievalService();
     dataRetrievalService
       .addDataRetriever(new DataRetrieverStocksRoBVB(httpClient))
-      .addDataRetriever(new DataRetrieverStocksApiDojoBloomberg(httpClient));
+      .addDataRetriever(new DataRetrieverStocksApiDojoBloomberg(httpClient))
+      .addDataRetriever(new DataRetrieverStocksFT(httpClient));
 
     updateInstruments(instrumentsToUpdate, dataRetrievalService);
 });

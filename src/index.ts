@@ -6,7 +6,9 @@ import { Instrument } from './Models/Instrument';
 import { InstrumentRepositoryAbstract } from './Repositories/InstrumentRepository/Abstract';
 import { DataRetrieverFX } from './Services/DataRetriever/DataRetrieverFX';
 import { DataRetrieverStocksRoBVB } from './Services/DataRetriever/DataRetrieverStocksRoBVB';
+import { DataRetrieverStocksFT } from './Services/DataRetriever/DataRetrieverStocksFT';
 import { DataRetrieverStocksApiDojoBloomberg } from './Services/DataRetriever/DataRetrieverStocksApiDojoBloomberg';
+import { DataRetrieverIndicesFT } from './Services/DataRetriever/DataRetrieverIndicesFT';
 
 /**
  * Updates the indexes and benchmarks values
@@ -18,7 +20,8 @@ function updateIndexesAndBenchmarks() {
 
   var dataRetrievalService = new BulkInstrumentDataRetrievalService();
   dataRetrievalService
-    .addDataRetriever(new DataRetrieverIndicesROBVB(new HTTPClientGoogleApps()));
+    .addDataRetriever(new DataRetrieverIndicesROBVB(new HTTPClientGoogleApps()))
+    .addDataRetriever(new DataRetrieverIndicesFT(new HTTPClientGoogleApps()));
 
   updateInstruments(instrumentsArray, dataRetrievalService, instrumentsRepo);
 }
@@ -49,7 +52,8 @@ function updateStocks() {
   var dataRetrievalService = new BulkInstrumentDataRetrievalService();
   dataRetrievalService
     .addDataRetriever(new DataRetrieverStocksRoBVB(new HTTPClientGoogleApps()))
-    .addDataRetriever(new DataRetrieverStocksApiDojoBloomberg(new HTTPClientGoogleApps()));
+    .addDataRetriever(new DataRetrieverStocksApiDojoBloomberg(new HTTPClientGoogleApps()))
+    .addDataRetriever(new DataRetrieverStocksFT(new HTTPClientGoogleApps()));
 
   updateInstruments(instrumentsArray, dataRetrievalService, instrumentsRepo);
 }
