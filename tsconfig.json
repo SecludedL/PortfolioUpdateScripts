@@ -3,7 +3,7 @@
       "lib": ["ES5"],
       "strict": false,
       "experimentalDecorators": true,
-      "esModuleInterop": true,
+      "esModuleInterop": false,
       "sourceMap": true,
       "rootDir": "./src", // Input directory
       "outDir": "./dist"  // Output directory
