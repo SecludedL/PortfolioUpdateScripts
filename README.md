@@ -11,5 +11,4 @@
     * `npm run dev-stocks` - grab the latest data for some sample stocks
 
 ## Publishing changes
-* Once you made the changes to the code, push them: `clasp push`
-* Open the script in your browser (for testing): `clasp open`
+* Once you made the changes to the code, deploy to prod using: `npm run deploy`

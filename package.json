@@ -3,16 +3,22 @@
     "@types/google-apps-script": "^1.0.78",
     "cheerio": "^1.0.0-rc.10",
     "commander": "^11.1.0",
+    "ncp": "^2.0.0",
+    "rimraf": "^5.0.5",
+    "rollup": "^4.9.6",
+    "rollup-plugin-cleanup": "^3.2.1",
+    "rollup-plugin-external-globals": "^0.9.2",
+    "rollup-plugin-typescript2": "^0.36.0",
     "sync-request": "^6.1.0"
   },
   "scripts": {
-    "dev-fx": "tsc src/dev/local.ts --outDir dist --sourceMap && node dist/dev/local.js update-fx",
-    "dev-indexes": "tsc src/dev/local.ts --outDir dist --sourceMap && node dist/dev/local.js update-indexes",
-    "dev-stocks": "tsc src/dev/local.ts --outDir dist --sourceMap && node dist/dev/local.js update-stocks",
-    "build": "tsc"
-  },
-  "devDependencies": {
-    "@types/jsdom": "^21.1.6",
-    "@types/node-fetch": "^2.6.11"
+    "clean": "rimraf build dist",
+    "bundle": "rollup --no-treeshake -c rollup.config.mjs",
+    "build": "npm run clean && npm run bundle && ncp appsscript.json dist/appsscript.json",
+    "dev:fx": "tsc src/dev/local.ts --outDir dist --sourceMap && node dist/dev/local.js update-fx",
+    "dev:indexes": "tsc src/dev/local.ts --outDir dist --sourceMap && node dist/dev/local.js update-indexes",
+    "dev:stocks": "tsc src/dev/local.ts --outDir dist --sourceMap && node dist/dev/local.js update-stocks",
+    "test": "echo \"No tests yet!\"",
+    "deploy": "npm run test && npm run build && clasp push"
   }
 }

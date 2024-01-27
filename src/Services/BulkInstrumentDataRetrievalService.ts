@@ -9,21 +9,12 @@ export class BulkInstrumentDataRetrievalService {
   }
 
   // adds a data retriever plugin to the list of plugins and assigns it a unique id
-  public addDataRetriever(pluginId: string, dataRetriever: DataRetrieverAbstract): BulkInstrumentDataRetrievalService {
-    this.dataRetrievers.set(pluginId, dataRetriever);
+  public addDataRetriever(dataRetriever: DataRetrieverAbstract): BulkInstrumentDataRetrievalService {
+    this.dataRetrievers.set(dataRetriever.constructor.name, dataRetriever);
     
     return this;
   }
-  
-  // removes a data retriever plugin from the list of plugins given its unique id
-  public removeDataRetriever(pluginId: string): BulkInstrumentDataRetrievalService {
-    if (this.dataRetrievers.has(pluginId)) {
-      this.dataRetrievers.delete(pluginId);
-    }
-    
-    return this;
-  }
-  
+
   // removes all data retriever plugins
   public resetDataRetrievers() {
     this.dataRetrievers.clear();
@@ -35,19 +26,19 @@ export class BulkInstrumentDataRetrievalService {
   // returns the updated instrument or null if no data retriever was found for the 
   // instrument or if the data retriever failed to retrieve the latest data 
   public retrieveLatestDataForSingleInstrument(instrument: Instrument): Instrument {
-    if (!instrument.needsUpdate()) {
-      console.log("Instrument " + instrument.getTicker() + " is already up to date.");
-      return instrument;
-    }
-
     let updater = this.getDataRetrieverForInstrument(instrument);
 
     if (updater == null) {
       console.log("No updater found for instrument: " + instrument.getTicker());
       return null;
     }
+
+    if (!instrument.needsUpdate()) {
+      console.log("Instrument " + instrument.getTicker() + " is already up to date.");
+      return instrument;
+    }
     
-    console.log("Updating instrument: " + instrument.getTicker() + " using updater: " + updater.constructor.name);
+    console.log("Updating instrument " + instrument.getTicker() + " using updater " + updater.constructor.name);
 
     let updatedInstrument = updater.getLatestDetails(instrument.getTicker());
 

@@ -3,6 +3,7 @@ import { DataRetrieverAbstract } from './DataRetrieverAbstract';
 import Cheerio, { CheerioAPI } from 'cheerio';
 
 export class DataRetrieverIndicesROBVB extends DataRetrieverAbstract {
+  // ticker format matched by this data retriever: IX.RO-<index_code>
   protected tickerFormat = /IX\.RO\-([a-z0-9-]{1,6})/i;
 
   public getLatestDetails(ticker: string): Instrument {

@@ -18,7 +18,7 @@ function updateIndexesAndBenchmarks() {
 
   var dataRetrievalService = new BulkInstrumentDataRetrievalService();
   dataRetrievalService
-    .addDataRetriever('indexesRO', new DataRetrieverIndicesROBVB(new HTTPClientGoogleApps()));
+    .addDataRetriever(new DataRetrieverIndicesROBVB(new HTTPClientGoogleApps()));
 
   updateInstruments(instrumentsArray, dataRetrievalService, instrumentsRepo);
 }
@@ -33,7 +33,7 @@ function updateFxRates() {
 
   var dataRetrievalService = new BulkInstrumentDataRetrievalService();
   dataRetrievalService
-    .addDataRetriever('fxRates', new DataRetrieverFX(new HTTPClientGoogleApps()));
+    .addDataRetriever(new DataRetrieverFX(new HTTPClientGoogleApps()));
 
   updateInstruments(instrumentsArray, dataRetrievalService, instrumentsRepo);
 }
@@ -48,8 +48,8 @@ function updateStocks() {
 
   var dataRetrievalService = new BulkInstrumentDataRetrievalService();
   dataRetrievalService
-    .addDataRetriever('stocksRO', new DataRetrieverStocksRoBVB(new HTTPClientGoogleApps()))
-    .addDataRetriever('stocksIntl', new DataRetrieverStocksApiDojoBloomberg(new HTTPClientGoogleApps()));
+    .addDataRetriever(new DataRetrieverStocksRoBVB(new HTTPClientGoogleApps()))
+    .addDataRetriever(new DataRetrieverStocksApiDojoBloomberg(new HTTPClientGoogleApps()));
 
   updateInstruments(instrumentsArray, dataRetrievalService, instrumentsRepo);
 }

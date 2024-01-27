@@ -1,18 +1,27 @@
 {
   "compilerOptions": {
-      "lib": ["ES5"],
-      "strict": false,
-      "experimentalDecorators": true,
-      "esModuleInterop": false,
-      "sourceMap": true,
-      "rootDir": "./src", // Input directory
-      "outDir": "./dist"  // Output directory
+    "target": "es2020",
+    "module": "es2020",
+    "lib": ["es2020"],
+    "moduleResolution": "node",
+    "strict": false,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "allowUnreachableCode": false,
+    "sourceMap": true,
+    "rootDir": ".", // Input directory
+    "outDir": "./dist"  // Output directory
   },
   "include": [
-      "./src/**/*.ts"
+    "src/**/*.ts",
+    "test/**/*.ts",
+    "rollup.config.mjs"
   ],
   "exclude": [
-      "node_modules",
-      "./src/dev/**/*.ts"
+    "node_modules",
+    "./src/dev/**/*.ts"
   ]
 }

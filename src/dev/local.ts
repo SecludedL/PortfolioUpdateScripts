@@ -25,7 +25,7 @@ program.command('update-indexes')
     const httpClient         = new HTTPClientSyncRequest();
     let dataRetrievalService = new BulkInstrumentDataRetrievalService();
     dataRetrievalService
-      .addDataRetriever('indexesRO', new DataRetrieverIndicesROBVB(httpClient));
+      .addDataRetriever(new DataRetrieverIndicesROBVB(httpClient));
 
     updateInstruments(instrumentsToUpdate, dataRetrievalService);
 });
@@ -42,7 +42,7 @@ program.command('update-fx')
     const httpClient         = new HTTPClientSyncRequest();
     let dataRetrievalService = new BulkInstrumentDataRetrievalService();
     dataRetrievalService
-      .addDataRetriever('fxRates', new DataRetrieverFX(httpClient));
+      .addDataRetriever(new DataRetrieverFX(httpClient));
     
     updateInstruments(instrumentsToUpdate, dataRetrievalService);
 });
@@ -64,8 +64,8 @@ program.command('update-stocks')
     const httpClient         = new HTTPClientSyncRequest();
     let dataRetrievalService = new BulkInstrumentDataRetrievalService();
     dataRetrievalService
-      .addDataRetriever('stocksRO', new DataRetrieverStocksRoBVB(httpClient))
-      .addDataRetriever('stocksIntl', new DataRetrieverStocksApiDojoBloomberg(httpClient));
+      .addDataRetriever(new DataRetrieverStocksRoBVB(httpClient))
+      .addDataRetriever(new DataRetrieverStocksApiDojoBloomberg(httpClient));
 
     updateInstruments(instrumentsToUpdate, dataRetrievalService);
 });

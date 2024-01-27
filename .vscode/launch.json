@@ -11,7 +11,7 @@
             "runtimeExecutable": "npm",
             "runtimeArgs": [
                 "run-script",
-                "dev-indexes"
+                "dev:indexes"
             ],
             // "preLaunchTask": "tsc: build - tsconfig.json", // runs the TypeScript compiler
             "outFiles": ["${workspaceFolder}/dist/**/*.js"], // points to the compiled JavaScript files
@@ -24,7 +24,7 @@
             "runtimeExecutable": "npm",
             "runtimeArgs": [
                 "run-script",
-                "dev-fx"
+                "dev:fx"
             ],
             // "preLaunchTask": "tsc: build - tsconfig.json", // runs the TypeScript compiler
             "outFiles": ["${workspaceFolder}/dist/**/*.js"], // points to the compiled JavaScript files
@@ -37,7 +37,7 @@
             "runtimeExecutable": "npm",
             "runtimeArgs": [
                 "run-script",
-                "dev-stocks"
+                "dev:stocks"
             ],
             // "preLaunchTask": "tsc: build - tsconfig.json", // runs the TypeScript compiler
             "outFiles": ["${workspaceFolder}/dist/**/*.js"], // points to the compiled JavaScript files
