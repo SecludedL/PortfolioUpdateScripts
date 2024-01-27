@@ -70,21 +70,6 @@ export class BulkInstrumentDataRetrievalService {
     return instruments;
   }
 
-  // return the instruments that match one of updater plugins alongside the corresponding updater
-  // private getInstrumentsMatchingPlugins(allInstruments: Map<string, Instrument>): Map<Instrument, DataRetrieverAbstract> {
-  //   let filteredInstruments = new Map<Instrument, DataRetrieverAbstract>();
-
-  //   allInstruments.forEach((instrument, key, map) => {
-  //       let matchedPlugins = this.getUpdaterPluginsForTicker(instrument.getTicker());
-
-  //       if (matchedPlugins.length > 0) {
-  //         filteredInstruments.set(instrument, matchedPlugins.pop());
-  //       }
-  //   })
-
-  //   return filteredInstruments;
-  // }
-  
   // return the first data retrieval plugin that matches the given ticker of an instrument
   private getDataRetrieverForInstrument(instrument:Instrument): DataRetrieverAbstract {
     const matchedPlugin = Array
